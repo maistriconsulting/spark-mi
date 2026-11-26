@@ -1,3 +1,3 @@
-from app.models.entities import Membership, Project, Tenant, User
+from app.models.entities import AuditEvent, Membership, Project, Tenant, User
 
-__all__ = ["Membership", "Project", "Tenant", "User"]
+__all__ = ["AuditEvent", "Membership", "Project", "Tenant", "User"]

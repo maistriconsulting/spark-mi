@@ -7,7 +7,7 @@ import jwt
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import decode_access_token
-from app.models import Membership, User
+from app.models import Membership, Tenant, User
 
 bearer_scheme = HTTPBearer(auto_error=True)
 
@@ -53,7 +53,9 @@ def get_tenant_context(
 
     membership = (
         db.query(Membership)
-        .filter_by(user_id=user.id, tenant_id=tenant_id, status="active")
+        .join(Tenant, Tenant.id == Membership.tenant_id)
+        .filter(Membership.user_id == user.id, Membership.tenant_id == tenant_id,
+                Membership.status == "active", Tenant.status == "active")
         .first()
     )
     if membership is None:

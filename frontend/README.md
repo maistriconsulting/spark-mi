@@ -2,6 +2,10 @@
 
 React + TypeScript + Vite static frontend, deployable on Hostinger PHP Web Hosting without Node.js at runtime.
 
+## Look and feel
+
+`src/tokens.css` and `public/brand/` are copies of Spark CRM's design tokens and logo. As in Spark, colour literals belong only in `tokens.css` (the `theme-color` meta tag in `index.html` is the one exception), styles are mobile first and the breakpoints are 640px and 1024px.
+
 ## Build locally
 
 ```bash

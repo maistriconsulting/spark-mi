@@ -1,0 +1,102 @@
+/*
+ * Spark CRM: token di design.
+ *
+ * Unica fonte dei valori visivi. Colori, ombre, dimensioni e font si dichiarano solo qui.
+ * Nessun altro file CSS, HTML o JavaScript può contenere valori di colore letterali.
+ * Le regole d'uso sono in docs/css-system.md.
+ *
+ * Nota: le media query non accettano variabili CSS. I breakpoint 640px e 1024px
+ * vanno scritti letteralmente e sono elencati in docs/css-system.md.
+ */
+
+:root {
+  /* Marca */
+  --spark-navy: #082b3a;
+  --spark-navy-2: #0e4658;
+  --spark-teal: #087e86;
+  --spark-teal-light: #67c9c5;
+  --spark-teal-soft: #e6f5f3;
+  --spark-progress-color: var(--spark-teal);
+  --spark-orange: #f47b20;
+  --spark-amber: #f5ad24;
+
+  /* Sidebar */
+  --spark-sidebar-bg: #063b4d;
+  --spark-sidebar-hover: #07506a;
+  --spark-sidebar-text: #eef6f8;
+  --spark-sidebar-muted: #b8d0d9;
+  --spark-sidebar-line: rgba(143, 185, 204, 0.25);
+
+  /* Neutri */
+  --spark-white: #ffffff;
+  --spark-bg: #f3f6f7;
+  --spark-surface: #ffffff;
+  --spark-line: #dce6e9;
+  --spark-input-line: #7f8f99;
+  --spark-ink: #17252d;
+  --spark-muted: #5f6e77;
+  --spark-neutral-soft: #edf1f3;
+
+  /* Stati (un solo significato per colore in tutta l'app) */
+  --spark-success: #28654a;
+  --spark-success-soft: #e8f3ee;
+  --spark-warning: #8a5b16;
+  --spark-warning-soft: #fff3dc;
+  --spark-danger: #9a3e32;
+  --spark-danger-soft: #fbecea;
+  --spark-info: #087e86;
+  --spark-info-soft: #e6f5f3;
+
+  /* Tipografia */
+  --spark-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --spark-font-size-xs: 11px;
+  --spark-font-size-sm: 13px;
+  --spark-font-size-md: 14px;
+  --spark-font-size-input: 16px;
+  --spark-font-size-lg: 18px;
+  --spark-font-size-xl: 28px;
+  --spark-font-size-kpi: 36px;
+  --spark-line-height: 1.45;
+  --spark-weight-regular: 400;
+  --spark-weight-medium: 550;
+  --spark-weight-strong: 700;
+  --spark-weight-heavy: 800;
+
+  /* Spaziatura (scala da 4px) */
+  --spark-space-1: 4px;
+  --spark-space-2: 8px;
+  --spark-space-3: 12px;
+  --spark-space-4: 16px;
+  --spark-space-5: 20px;
+  --spark-space-6: 24px;
+  --spark-space-8: 32px;
+  --spark-space-10: 40px;
+
+  /* Forma */
+  --spark-radius-sm: 8px;
+  --spark-radius-md: 12px;
+  --spark-radius-lg: 18px;
+  --spark-radius-pill: 999px;
+  --spark-border-width: 1px;
+  --spark-shadow-sm: 0 5px 18px rgba(8, 43, 58, 0.06);
+  --spark-shadow-md: 0 14px 42px rgba(8, 43, 58, 0.07);
+  --spark-overlay: rgba(8, 43, 58, 0.45);
+  --spark-focus-ring: 0 0 0 3px rgba(8, 126, 134, 0.35);
+
+  /* Misure */
+  --spark-touch-target: 44px;
+  --spark-sidebar-width: 250px;
+  --spark-topbar-height: 64px;
+  --spark-content-max: 1280px;
+  --spark-icon-size: 25px;
+  --spark-icon-size-sm: 18px;
+  --spark-icon-button: 34px;
+
+  /* Movimento */
+  --spark-transition: 160ms ease;
+
+  /* Livelli di sovrapposizione */
+  --spark-z-topbar: 10;
+  --spark-z-nav: 40;
+  --spark-z-modal: 100;
+}

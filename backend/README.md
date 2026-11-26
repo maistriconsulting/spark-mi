@@ -47,7 +47,24 @@ Login returns a user token. `GET /api/v1/auth/tenants` lists organizations for w
 
 The global superadmin role is stored on the user record and checked server-side. It is separate from tenant membership and does not bypass tenant context or grant automatic access to tenant data. Tenant-scoped APIs continue to require a valid active membership and verified tenant context.
 
-`GET /api/v1/auth/platform/overview` is restricted to the database-backed global superadmin role and returns the platform overview and active organization list. Organization editing and management operations are outside the first-release scope.
+`GET /api/v1/auth/platform/overview` is restricted to the database-backed global superadmin role and returns the platform overview and active organization list. Management operations are described below.
+
+## Platform management (superadmin only)
+
+All routes live under `/api/v1/platform` and check the database-backed superadmin flag:
+
+| Route | Purpose |
+|---|---|
+| `GET /roles` | The five fixed organization roles and what the API enforces today |
+| `GET`, `POST /tenants`; `PATCH /tenants/{id}` | List, create, rename, suspend and reactivate organizations |
+| `GET`, `POST /users`; `PATCH /users/{id}` | List, create, rename, deactivate and reactivate users |
+| `POST /users/{id}/reset-password` | Generate a new temporary password, returned once |
+| `PUT /tenants/{id}/members/{user_id}` | Add a member, change role, revoke or restore access |
+| `GET /audit` | Administrative audit log |
+
+Rules: nothing is hard-deleted; the superadmin flag cannot be set through the API; superadmin accounts cannot be deactivated or reset here; the last active owner of an organization cannot be demoted or revoked (deactivating that user is still allowed, and the UI then flags the organization as having no owner). Suspending an organization blocks tenant access on the next request. Every change writes an `audit_events` row without secrets.
+
+There is no email flow yet: new users receive a generated temporary password that the administrator delivers manually. Users change it with `POST /api/v1/auth/change-password`. A password change or reset does not revoke tokens already issued (they expire within `ACCESS_TOKEN_EXPIRE_MINUTES`); deactivation takes effect immediately.
 
 ## Production topology
 
@@ -69,6 +86,6 @@ The Fedora host must be explicitly allowed by Hostinger's remote database access
 
 ## Current first-release scope
 
-Authentication, one-time global superadmin bootstrap, tenant membership and selection, tenant-scoped project CRUD, health checks, and the initial platform overview.
+Authentication, one-time global superadmin bootstrap, tenant membership and selection, tenant-scoped project listing and creation, health checks, platform management of organizations, users and roles, and the administrative audit log.
 
-Invitations, user administration, refresh tokens, password recovery, audit events, campaigns, superadmin organization editing, and further production hardening are outside this release batch.
+Invitations, delegated administration by tenant owners and admins, refresh tokens, password recovery, login rate limiting, campaigns and further production hardening are not implemented.

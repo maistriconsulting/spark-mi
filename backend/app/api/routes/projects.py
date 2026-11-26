@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import TenantContext, get_tenant_context
+from app.core.roles import PROJECT_WRITERS
 from app.models import Project
 from app.schemas.projects import ProjectCreate, ProjectResponse
 
@@ -20,7 +21,7 @@ def create_project(
     ctx: TenantContext = Depends(get_tenant_context),
     db: Session = Depends(get_db),
 ):
-    if ctx.role not in {"owner", "admin", "analyst"}:
+    if ctx.role not in PROJECT_WRITERS:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     existing = db.query(Project).filter_by(tenant_id=ctx.tenant_id, slug=payload.slug).first()
     if existing:

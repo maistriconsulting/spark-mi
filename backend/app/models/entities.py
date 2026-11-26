@@ -64,3 +64,18 @@ class Project(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     tenant: Mapped[Tenant] = relationship(back_populates="projects")
+
+
+class AuditEvent(Base):
+    """Append-only log of administrative actions. No foreign keys: history must outlive its targets."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    actor_user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
+    target_type: Mapped[str] = mapped_column(String(24), nullable=False)
+    target_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    detail: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

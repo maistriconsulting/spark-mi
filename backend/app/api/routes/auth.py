@@ -2,13 +2,14 @@ from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core import audit
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_superadmin, get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models import Membership, Tenant, User
 from app.schemas.auth import (
-    BootstrapRequest, BootstrapStatusResponse, LoginRequest, PlatformOverviewResponse,
+    BootstrapRequest, BootstrapStatusResponse, ChangePasswordRequest, LoginRequest, PlatformOverviewResponse,
     SelectTenantRequest, TenantSummary, TokenResponse,
 )
 
@@ -75,12 +76,28 @@ def select_tenant(
 ):
     membership = (
         db.query(Membership)
-        .filter_by(user_id=user.id, tenant_id=payload.tenant_id, status="active")
+        .join(Tenant, Tenant.id == Membership.tenant_id)
+        .filter(Membership.user_id == user.id, Membership.tenant_id == payload.tenant_id,
+                Membership.status == "active", Tenant.status == "active")
         .first()
     )
     if membership is None:
         raise HTTPException(status_code=403, detail="You are not a member of this organization")
     return TokenResponse(access_token=create_access_token(user_id=user.id, tenant_id=payload.tenant_id, is_superadmin=user.is_superadmin), is_superadmin=user.is_superadmin)
+
+
+@router.post("/change-password", status_code=204)
+def change_password(
+    payload: ChangePasswordRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # 400, not 401: a typo here must not end the session.
+    if not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(status_code=400, detail="La password attuale non è corretta")
+    user.password_hash = hash_password(payload.new_password)
+    audit.record(db, user, "user.change_password", "user", user.id, email=user.email)
+    db.commit()
 
 
 @router.get("/me")
