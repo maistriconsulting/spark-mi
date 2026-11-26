@@ -1,0 +1,71 @@
+name: Deploy frontend to Hostinger
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOST: 82.25.102.236
+      DEPLOY_PORT: "65002"
+      DEPLOY_USER: u834942357
+      DEPLOY_PATH: /home/u834942357/domains/sparkmi.maistriconsulting.com/public_html/
+      VITE_API_BASE_URL: https://sparkmi-api.bianconiglio.eu/api/v1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend for production
+        working-directory: frontend
+        run: npm run build
+
+      - name: Include Apache configuration in the publishable artifact
+        run: |
+          test -f frontend/.htaccess
+          test -f frontend/dist/index.html
+          cp frontend/.htaccess frontend/dist/.htaccess
+          test -f frontend/dist/.htaccess
+
+      - name: Configure deploy SSH key
+        env:
+          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.SPARK_MI_DEPLOY_SSH_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.SPARK_MI_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_SSH_PRIVATE_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Refuse deployment while source files exist in public_html
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_CHECK'
+          set -eu
+          test -d "$DEPLOY_PATH"
+          for blocked in backend frontend .git .env; do
+            if test -e "$DEPLOY_PATH/$blocked"; then
+              echo "Refusing deploy: source path remains in public_html: $blocked" >&2
+              exit 1
+            fi
+          done
+          REMOTE_CHECK
+
+      - name: Publish only frontend/dist contents
+        run: |
+          scp -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -P "$DEPLOY_PORT" -r frontend/dist/. \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
