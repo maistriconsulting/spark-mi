@@ -50,8 +50,18 @@ jobs:
         run: |
           set -euo pipefail
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+
+          # Accept either a normal multiline OpenSSH key or a secret containing literal "\n".
+          printf '%s' "$SSH_PRIVATE_KEY" | tr -d '\r' | sed 's/\\n/\n/g' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+
+          if ! ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null 2>~/.ssh/key-validation.err; then
+            echo "HOSTINGER_SSH_PRIVATE_KEY is not a readable OpenSSH private key."
+            echo "Replace that GitHub secret with the complete private key file contents, including BEGIN/END lines."
+            echo "Do not add quotes; preserve all line breaks. Do not share the key in chat."
+            exit 1
+          fi
+          rm -f ~/.ssh/key-validation.err
 
           expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB4Op6oFQWIcz735b8M'
           key_file="$(mktemp)"
