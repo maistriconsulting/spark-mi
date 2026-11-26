@@ -59,3 +59,10 @@ def get_tenant_context(
     if membership is None:
         raise HTTPException(status_code=403, detail="You are not an active member of this organization")
     return TenantContext(user=user, tenant_id=tenant_id, role=membership.role)
+
+
+def get_current_superadmin(user: User = Depends(get_current_user)) -> User:
+    # Use the database value, not the JWT claim, so privilege revocation is immediate.
+    if not user.is_superadmin:
+        raise HTTPException(status_code=403, detail="Superadmin privileges required")
+    return user

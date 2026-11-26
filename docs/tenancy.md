@@ -20,6 +20,8 @@ Ruoli iniziali:
 - reviewer: revisione, validazione e approvazione.
 - viewer: sola consultazione autorizzata.
 
+`superadmin` non è un ruolo di membership: è un flag globale dell'utente, assegnabile solo tramite controlli amministrativi della piattaforma. Non aggira il tenant context delle API tenant-scoped; le funzioni globali devono dichiararlo esplicitamente, richiedere il controllo server-side del flag e produrre audit.
+
 Applicare il principio del minimo privilegio. Le autorizzazioni vanno verificate lato server per ogni operazione, non solo nascondendo elementi nell'interfaccia.
 
 ## Protezione dei dati

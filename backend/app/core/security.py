@@ -16,11 +16,12 @@ def verify_password(password: str, hashed: str) -> bool:
     return password_hash.verify(password, hashed)
 
 
-def create_access_token(*, user_id: int, tenant_id: int | None = None) -> str:
+def create_access_token(*, user_id: int, tenant_id: int | None = None, is_superadmin: bool = False) -> str:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user_id),
         "tenant_id": tenant_id,
+        "is_superadmin": is_superadmin,
         "iat": now,
         "exp": now + timedelta(minutes=settings.access_token_expire_minutes),
         "type": "access",
