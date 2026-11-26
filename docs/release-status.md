@@ -2,23 +2,30 @@
 
 **Aggiornato:** 26 novembre 2026  
 **Ramo di riferimento:** `feat/multi-tenant-foundation`  
-**Merge commit integrativo:** `3101f02`  
-**Feature integrata:** `cdd718d` — bootstrap iniziale del superadmin globale
+**Versione distribuita:** `45f1a1c` (codice applicativo backend identico a `3101f02`)
 
 ## Stato attuale
 
-La funzionalità di bootstrap del superadmin è stata integrata nel ramo di lavoro. Il ramo `main` non è stato modificato.
+Backend e frontend sono **distribuiti**. Il rilascio **non è concluso**: manca l'attivazione del superadmin. Il ramo `main` non è stato modificato.
 
-Il codice è pronto per il rilascio controllato, ma **non è ancora distribuito in produzione**. Non risultano eseguiti per questo rilascio:
+Eseguito il 26 novembre 2026:
 
-- backup del database;
-- distribuzione del backend aggiornato sul server Fedora;
-- applicazione della migrazione `0002_superadmin`;
-- build e pubblicazione del frontend aggiornato;
-- configurazione temporanea di `BOOTSTRAP_TOKEN`;
-- creazione dell'account superadmin.
+- database verificato vuoto (nessuna tabella) prima della migrazione, quindi nessun dato da salvare; rollback del backend: commit `3ab5a8b`;
+- backend aggiornato sul server Fedora, 6 test superati sul server;
+- migrazioni applicate su MariaDB fino a `0002_superadmin` (head);
+- verifiche pubbliche: `/ready` 200, `bootstrap-status` `initialized=false`, panoramica senza autenticazione 401, bootstrap senza token 404, login errato 401, CORS per l'origine del frontend;
+- frontend compilato da `45f1a1c` e pubblicato; pagina di accesso verificata nel browser senza errori in console. Backup del sito precedente in `domains/sparkmi.maistriconsulting.com/backups/public_html-pre-45f1a1c.tgz`;
+- script di attivazione provato end-to-end su un'API locale con database SQLite.
 
-L'accesso operativo al server Fedora tramite Tailscale deve ancora essere predisposto.
+Da eseguire: punti 7-11 della sequenza (script di attivazione, con password scelta dal titolare, e login reale). `BOOTSTRAP_TOKEN` è configurato sul server e resta attivo fino a quel momento.
+
+## Limiti noti
+
+- Dopo l'attivazione non esiste alcuna funzione (API, script o interfaccia) per creare organizzazioni e membership: la piattaforma non è ancora utilizzabile per progetti.
+- Il login non ha limitazione dei tentativi.
+- La connessione a MariaDB usa TLS ma non verifica il certificato.
+- La sessione si perde ricaricando la pagina; le voci del menu laterale non sono ancora funzionanti.
+- Il server Fedora è una soluzione temporanea per il backend.
 
 ## Perimetro funzionale del primo rilascio
 
@@ -81,4 +88,4 @@ Non pubblicare il frontend prima del backend: la nuova interfaccia richiama endp
 
 Il batch può essere dichiarato concluso solo dopo il completamento della sequenza di rilascio, la verifica del login reale e la conferma che il token temporaneo è stato rimosso e il bootstrap non è più ripetibile.
 
-Fino ad allora lo stato resta: **integrato nel ramo di lavoro, pronto per il rilascio, non distribuito e non concluso**.
+Fino ad allora lo stato resta: **distribuito, in attesa di attivazione, non concluso**.

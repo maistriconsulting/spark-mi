@@ -54,10 +54,4 @@ Run database migrations only after verifying application-level MariaDB authentic
 
 ## Current deployment notes
 
-- The `feat/multi-tenant-foundation` branch at commit `3ab5a8b` is the installed application baseline described during initial deployment.
-- The backend service was reported as running on `127.0.0.1:8800`, with the basic health check responding successfully.
-- Fedora-to-Hostinger network reachability was confirmed; Hostinger identified the connecting server as `81.57.56.182`.
-- MariaDB authentication has not yet been confirmed; an access rejection without supplying the database password was expected.
-- The frontend build/publication using the new `VITE_API_BASE_URL` must be verified separately.
-
-This document records the deployment topology and the status reported during setup. Recheck the current service, tunnel, database and frontend state before treating the environment as production-ready.
+See [release status](release-status.md) for the deployed version and open items.

@@ -12,7 +12,7 @@ Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagn
 
 ## Stato del rilascio
 
-La foundation multi-tenant e il bootstrap superadmin sono integrati in `feat/multi-tenant-foundation` (merge commit `3101f02`). Il rilascio in produzione è ancora da eseguire: backend Fedora, migrazione `0002_superadmin`, frontend e bootstrap account. Consultare [stato del rilascio](docs/release-status.md) per la sequenza e i criteri di chiusura.
+La foundation multi-tenant e il bootstrap superadmin sono in `feat/multi-tenant-foundation`. Backend e frontend sono distribuiti; resta l'attivazione dell'account superadmin. Consultare [stato del rilascio](docs/release-status.md).
 
 ## Sviluppo
 
