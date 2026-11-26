@@ -16,9 +16,9 @@ Comprende colori e logo Spark; gestione di organizzazioni, utenti e ruoli riserv
 Verifiche eseguite:
 
 - 13 test backend superati sul server (SQLite);
-- percorso completo nell'interfaccia in locale, con account usa e getta su SQLite; layout controllato a 390 px prima dell'ultima modifica CSS al menu mobile;
-- backup delle tabelle prima della migrazione, sul server Fedora in `~/backups/spark-mi/pre-996d78b.json` (permessi 600, contiene hash delle password);
-- migrazione `0003_audit_events` applicata su MariaDB;
+- percorso completo nell'interfaccia in locale, con account usa e getta su SQLite, con controllo del layout a 390 px e su desktop;
+- backup delle tabelle eseguito prima della migrazione;
+- migrazione `0003_audit_events` applicata su MariaDB; tabelle InnoDB in `utf8mb4`, letture della gestione piattaforma eseguite sui dati reali;
 - in produzione: `/ready` 200, API di gestione senza autenticazione 401, preflight CORS per `PATCH` accettato, bundle pubblicato identico alla build.
 
 **Da verificare dal titolare in produzione:** accesso superadmin e creazione della prima organizzazione.
