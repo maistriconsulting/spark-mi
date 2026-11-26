@@ -12,7 +12,7 @@ Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagn
 
 ## Stato del rilascio
 
-La foundation multi-tenant e il bootstrap superadmin sono in `feat/multi-tenant-foundation`. Backend e frontend sono distribuiti; resta l'attivazione dell'account superadmin. Consultare [stato del rilascio](docs/release-status.md).
+La foundation multi-tenant e la gestione di organizzazioni, utenti e ruoli sono in `feat/multi-tenant-foundation` e distribuite. Consultare [stato del rilascio](docs/release-status.md).
 
 ## Sviluppo
 
