@@ -18,7 +18,6 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    # Deployment is enabled only after the Hostinger SSH configuration is complete.
     if: vars.HOSTINGER_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -43,23 +42,42 @@ jobs:
           test -s dist/index.html
           cp .htaccess dist/.htaccess
 
-      - name: Configure SSH
+      - name: Configure SSH and verify Hostinger host key
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
+          HOST: \${{ secrets.HOSTINGER_SSH_HOST }}
+          PORT: \${{ secrets.HOSTINGER_SSH_PORT }}
+          SSH_PRIVATE_KEY: \${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
         run: |
+          set -euo pipefail
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+          expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB40p6oFQWICz735b8M'
+          key_file="$(mktemp)"
+          trap 'rm -f "$key_file"' EXIT
+
+          ssh-keyscan -T 15 -p "$PORT" -t ed25519 "$HOST" 2>/dev/null > "$key_file"
+          test -s "$key_file"
+
+          actual_fingerprint="$(ssh-keygen -lf "$key_file" -E sha256 | awk '{print $2}')"
+          if [ "$actual_fingerprint" != "$expected_fingerprint" ]; then
+            echo "Hostinger ED25519 fingerprint mismatch."
+            echo "Expected: $expected_fingerprint"
+            echo "Received: $actual_fingerprint"
+            exit 1
+          fi
+
+          cp "$key_file" ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
+          echo "Hostinger ED25519 host key verified."
 
       - name: Validate destination and deploy static files
         env:
-          HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
-          PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
-          USER: ${{ secrets.HOSTINGER_SSH_USER }}
-          TARGET: ${{ secrets.HOSTINGER_SSH_TARGET }}
+          HOST: \${{ secrets.HOSTINGER_SSH_HOST }}
+          PORT: \${{ secrets.HOSTINGER_SSH_PORT }}
+          USER: \${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: \${{ secrets.HOSTINGER_SSH_TARGET }}
         run: |
           set -euo pipefail
           test -n "$HOST"
