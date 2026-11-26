@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 import jwt
 
@@ -9,7 +9,7 @@ from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models import Membership, User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.api_prefix}/auth/login")
+bearer_scheme = HTTPBearer(auto_error=True)
 
 
 @dataclass(frozen=True)
@@ -19,10 +19,17 @@ class TenantContext:
     role: str
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    unauthorized = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User:
+    unauthorized = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid authentication credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
-        payload = decode_access_token(token)
+        payload = decode_access_token(credentials.credentials)
         if payload.get("type") != "access" or not payload.get("sub"):
             raise unauthorized
         user = db.get(User, int(payload["sub"]))
@@ -35,11 +42,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def get_tenant_context(
     user: User = Depends(get_current_user),
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> TenantContext:
     try:
-        payload = decode_access_token(token)
+        payload = decode_access_token(credentials.credentials)
         tenant_id = int(payload["tenant_id"])
     except (jwt.PyJWTError, KeyError, ValueError, TypeError):
         raise HTTPException(status_code=403, detail="Select an organization before accessing this resource")
