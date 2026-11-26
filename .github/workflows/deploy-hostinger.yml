@@ -44,8 +44,8 @@ jobs:
 
       - name: Configure SSH and verify Hostinger host key
         env:
-          HOST: \${{ secrets.HOSTINGER_SSH_HOST }}
-          PORT: \${{ secrets.HOSTINGER_SSH_PORT }}
+          HOST: 82.25.102.236
+          PORT: "65002"
           SSH_PRIVATE_KEY: \${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
@@ -58,14 +58,13 @@ jobs:
           scan_error="$(mktemp)"
           trap 'rm -f "$key_file" "$scan_error"' EXIT
 
-          echo "Checking SSH host-key endpoint on configured Hostinger host and port..."
+          echo "Checking SSH host-key endpoint on Hostinger..."
           scan_status=0
           ssh-keyscan -T 20 -p "$PORT" -t ed25519 "$HOST" > "$key_file" 2> "$scan_error" || scan_status=$?
 
           if [ ! -s "$key_file" ]; then
-            echo "Unable to retrieve an ED25519 host key from the configured endpoint (ssh-keyscan exit: $scan_status)."
+            echo "Unable to retrieve an ED25519 host key (ssh-keyscan exit: $scan_status)."
             cat "$scan_error"
-            echo "Check HOSTINGER_SSH_HOST and HOSTINGER_SSH_PORT in GitHub Actions secrets, and confirm SSH access is enabled in Hostinger."
             exit 1
           fi
 
@@ -83,15 +82,12 @@ jobs:
 
       - name: Validate destination and deploy static files
         env:
-          HOST: \${{ secrets.HOSTINGER_SSH_HOST }}
-          PORT: \${{ secrets.HOSTINGER_SSH_PORT }}
-          USER: \${{ secrets.HOSTINGER_SSH_USER }}
+          HOST: 82.25.102.236
+          PORT: "65002"
+          USER: u834942357
           TARGET: \${{ secrets.HOSTINGER_SSH_TARGET }}
         run: |
           set -euo pipefail
-          test -n "$HOST"
-          test -n "$PORT"
-          test -n "$USER"
           test -n "$TARGET"
           case "$TARGET" in
             */public_html) ;;
