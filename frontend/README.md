@@ -6,11 +6,11 @@ React + TypeScript + Vite static frontend, deployable on Hostinger PHP Web Hosti
 
 ```bash
 npm install
-npm run build
+VITE_API_BASE_URL=https://api.sparkmi.maistriconsulting.com/api/v1 npm run build
 ```
 
 Upload the contents of `dist/` to the document root for `sparkmi.maistriconsulting.com`. The `.htaccess` file enables client-side route fallback and basic response headers.
 
-Set `VITE_API_BASE_URL` at build time. For same-origin reverse proxy routing, use `/api/v1`. If the API is hosted on a separate hostname, use its HTTPS API base URL and add that exact origin to the backend CORS allowlist.
+The API is intended to run on the Fedora server at `api.sparkmi.maistriconsulting.com`, behind an HTTPS reverse proxy. Set that URL in `VITE_API_BASE_URL` at build time and configure backend `CORS_ORIGINS=https://sparkmi.maistriconsulting.com`.
 
 Node.js is required only on the development/build machine or CI runner, not on Hostinger for serving the compiled static assets.
