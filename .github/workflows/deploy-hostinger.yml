@@ -55,10 +55,19 @@ jobs:
 
           expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB40p6oFQWICz735b8M'
           key_file="$(mktemp)"
-          trap 'rm -f "$key_file"' EXIT
+          scan_error="$(mktemp)"
+          trap 'rm -f "$key_file" "$scan_error"' EXIT
 
-          ssh-keyscan -T 15 -p "$PORT" -t ed25519 "$HOST" 2>/dev/null > "$key_file"
-          test -s "$key_file"
+          echo "Checking SSH host-key endpoint on configured Hostinger host and port..."
+          scan_status=0
+          ssh-keyscan -T 20 -p "$PORT" -t ed25519 "$HOST" > "$key_file" 2> "$scan_error" || scan_status=$?
+
+          if [ ! -s "$key_file" ]; then
+            echo "Unable to retrieve an ED25519 host key from the configured endpoint (ssh-keyscan exit: $scan_status)."
+            cat "$scan_error"
+            echo "Check HOSTINGER_SSH_HOST and HOSTINGER_SSH_PORT in GitHub Actions secrets, and confirm SSH access is enabled in Hostinger."
+            exit 1
+          fi
 
           actual_fingerprint="$(ssh-keygen -lf "$key_file" -E sha256 | awk '{print $2}')"
           if [ "$actual_fingerprint" != "$expected_fingerprint" ]; then
