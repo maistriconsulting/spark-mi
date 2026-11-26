@@ -18,8 +18,7 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    # Keep disabled until Hostinger SSH secrets are configured and its native
-    # repository deployment has been switched to manual/off.
+    # Deployment is enabled only after the Hostinger SSH configuration is complete.
     if: vars.HOSTINGER_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -50,9 +49,9 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          printf '%s\\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: Validate destination and deploy static files
@@ -74,6 +73,6 @@ jobs:
               exit 1
               ;;
           esac
-          rsync -az --delete \
-            -e "ssh -p $PORT -o StrictHostKeyChecking=yes" \
+          rsync -az --delete \\
+            -e "ssh -p $PORT -o StrictHostKeyChecking=yes" \\
             frontend/dist/ "$USER@$HOST:$TARGET/"
