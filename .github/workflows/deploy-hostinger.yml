@@ -53,7 +53,7 @@ jobs:
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB40p6oFQWIcz735b8M'
+          expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB4Op6oFQWIcz735b8M'
           key_file="$(mktemp)"
           scan_error="$(mktemp)"
           trap 'rm -f "$key_file" "$scan_error"' EXIT
