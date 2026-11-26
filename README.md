@@ -10,9 +10,9 @@ Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagn
 - `frontend/`: React + TypeScript, compilato come sito statico per Hostinger.
 - `docs/`: architettura, modello dati, agenti, tenancy, governance e roadmap.
 
-## Foundation in sviluppo
+## Stato del rilascio
 
-La prima foundation implementa autenticazione email/password, bootstrap iniziale protetto, selezione organizzazione, membership e ruoli, tenant context verificato lato server, progetti tenant-scoped, health checks e prima dashboard web.
+La foundation multi-tenant e il bootstrap superadmin sono integrati in `feat/multi-tenant-foundation` (merge commit `3101f02`). Il rilascio in produzione è ancora da eseguire: backend Fedora, migrazione `0002_superadmin`, frontend e bootstrap account. Consultare [stato del rilascio](docs/release-status.md) per la sequenza e i criteri di chiusura.
 
 ## Sviluppo
 
@@ -29,6 +29,7 @@ Non inserire mai credenziali, token o chiavi reali nel repository. I file `.env`
 - [Piano di ricerca](docs/research-plan.md)
 - [Roadmap](docs/roadmap.md)
 - [Governance e qualità](docs/governance.md)
+- [Stato del rilascio](docs/release-status.md)
 
 ## Principi
 
