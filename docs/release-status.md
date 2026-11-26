@@ -67,11 +67,13 @@ Questi risultati non sostituiscono le verifiche sull'ambiente reale dopo il depl
 4. Distribuire il backend dal commit `3101f02`.
 5. Applicare la migrazione Alembic `0002_superadmin`.
 6. Configurare temporaneamente `BOOTSTRAP_TOKEN` nell'ambiente protetto del servizio e riavviare il backend.
-7. Eseguire il bootstrap da console fidata sul server, con password scelta e digitata al momento.
+7. Eseguire `backend/scripts/activate_superadmin.py` da console interattiva sul server (vedi `backend/README.md`), con password scelta e digitata al momento.
 8. Costruire e pubblicare il frontend dallo stesso commit, dopo aver verificato la disponibilità degli endpoint backend.
 9. Verificare il login reale di `info@maistriconsulting.com`, l'accesso alla panoramica globale e la lista delle organizzazioni.
-10. Rimuovere `BOOTSTRAP_TOKEN` dall'ambiente e riavviare il servizio.
-11. Verificare che un nuovo tentativo di bootstrap venga rifiutato con `409`.
+10. Con il token ancora configurato, verificare che un nuovo tentativo di bootstrap venga rifiutato con `409`.
+11. Rimuovere `BOOTSTRAP_TOKEN`, riavviare il servizio e verificare che l'endpoint risponda `404`.
+
+Lo script del punto 7 esegue anche le verifiche API del punto 9 e i punti 10 e 11. Il frontend non contiene un modulo di bootstrap, quindi la sua pubblicazione non dipende dal punto 7.
 
 Non pubblicare il frontend prima del backend: la nuova interfaccia richiama endpoint introdotti da questa integrazione.
 

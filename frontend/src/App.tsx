@@ -14,12 +14,11 @@ export default function App() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [initialized, setInitialized] = useState<boolean | null>(null);
-  const [bootstrapPassword, setBootstrapPassword] = useState("");
-  const [bootstrapConfirmation, setBootstrapConfirmation] = useState("");
   const [platform, setPlatform] = useState<PlatformOverview | null>(null);
 
   useEffect(() => {
-    api.bootstrapStatus().then(status => setInitialized(status.initialized)).catch(() => setError("Impossibile verificare lo stato della piattaforma."));
+    // Informational only: the login form must stay usable if this check fails.
+    api.bootstrapStatus().then(status => setInitialized(status.initialized)).catch(() => undefined);
   }, []);
 
   async function loadTenants(userToken: string) {
@@ -37,20 +36,6 @@ export default function App() {
         setPlatform(await api.platformOverview(result.access_token));
       } else await loadTenants(result.access_token);
     } catch (err) { setError(err instanceof Error ? err.message : "Accesso non riuscito"); }
-    finally { setBusy(false); }
-  }
-
-  async function handleBootstrap(event: FormEvent) {
-    event.preventDefault(); setError("");
-    if (bootstrapPassword.length < 12) return setError("La password deve contenere almeno 12 caratteri.");
-    if (bootstrapPassword !== bootstrapConfirmation) return setError("Le password non coincidono.");
-    setBusy(true);
-    try {
-      const result = await api.bootstrap(bootstrapPassword);
-      setSession({ userToken: result.access_token, isSuperadmin: true });
-      setPlatform(await api.platformOverview(result.access_token));
-      setInitialized(true); setBootstrapPassword(""); setBootstrapConfirmation("");
-    } catch (err) { setError(err instanceof Error ? err.message : "Configurazione iniziale non riuscita"); }
     finally { setBusy(false); }
   }
 
@@ -82,21 +67,6 @@ export default function App() {
     setSession(null); setTenants([]); setProjects([]); setPassword(""); setError("");
   }
 
-  if (initialized === false && !session) return (
-    <main className="auth-shell"><section className="login-card">
-      <div className="brand-mark">S</div><p className="eyebrow">CONFIGURAZIONE INIZIALE</p><h1>Attiva SPARK-MI</h1>
-      <p className="muted">Crea il primo account amministratore della piattaforma.</p>
-      <form onSubmit={handleBootstrap} className="form-stack">
-        <label>Email<input type="email" value="info@maistriconsulting.com" disabled /></label>
-        <label>Password<input type="password" autoComplete="new-password" value={bootstrapPassword} onChange={e => setBootstrapPassword(e.target.value)} required minLength={12} /></label>
-        <label>Conferma password<input type="password" autoComplete="new-password" value={bootstrapConfirmation} onChange={e => setBootstrapConfirmation(e.target.value)} required minLength={12} /></label>
-        {error && <p className="error">{error}</p>}<button disabled={busy}>{busy ? "Configurazione..." : "Crea superadmin"}</button>
-      </form>
-    </section></main>
-  );
-
-  if (initialized === null && !session) return <main className="auth-shell"><p className="muted">Verifica configurazione…</p></main>;
-
   if (!session) return (
     <main className="auth-shell">
       <section className="login-card">
@@ -110,6 +80,7 @@ export default function App() {
           {error && <p className="error">{error}</p>}
           <button disabled={busy}>{busy ? "Accesso..." : "Accedi"}</button>
         </form>
+        {initialized === false && <p className="footnote">Piattaforma non ancora attivata: il primo account si crea dal server.</p>}
         <p className="footnote">Accesso riservato agli utenti invitati.</p>
       </section>
     </main>
@@ -118,6 +89,7 @@ export default function App() {
   if (session.isSuperadmin) return (
     <div className="app-shell"><aside className="sidebar"><div className="sidebar-brand"><span className="brand-small">S</span><strong>SPARK-MI</strong></div><div className="workspace-label">PIATTAFORMA</div><div className="workspace-name">Superadmin</div><div className="sidebar-bottom"><span>superadmin globale</span><button onClick={logout}>Esci</button></div></aside>
       <main className="main-content"><header className="topbar"><div><span className="eyebrow">AMMINISTRAZIONE PIATTAFORMA</span><h2>Panoramica globale</h2></div></header>
+        {error && <p className="error">{error}</p>}
         <section className="welcome"><div><p className="eyebrow">SPARK-MI</p><h1>Superadmin attivo.</h1><p>Le organizzazioni restano isolate: l’accesso ai loro dati richiede funzioni globali esplicite e tracciate.</p></div></section>
         <section className="project-layout"><div className="create-card"><h3>Organizzazioni</h3><p className="muted">{platform?.tenant_count ?? 0} organizzazioni · {platform?.user_count ?? 0} utenti.</p>{platform?.tenants.map(t => <p key={t.id}>{t.name} <small>({t.slug})</small></p>)}</div></section>
       </main></div>

@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "https://api.sparkmi.maistriconsulting.com/api/v1";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "https://sparkmi-api.bianconiglio.eu/api/v1";
 
 async function request<T>(path: string, token?: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -11,7 +11,8 @@ async function request<T>(path: string, token?: string, init: RequestInit = {}):
   });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.detail ?? `Request failed (${response.status})`);
+    // FastAPI returns a string for application errors and an array for validation errors.
+    throw new Error(typeof body.detail === "string" ? body.detail : `Richiesta non riuscita (${response.status})`);
   }
   return response.json() as Promise<T>;
 }
@@ -24,9 +25,6 @@ export type PlatformOverview = { user_count: number; tenant_count: number; tenan
 
 export const api = {
   bootstrapStatus: () => request<BootstrapStatus>("/auth/bootstrap-status"),
-  // The bootstrap token is deliberately not available to browser code. A trusted
-  // server-side gateway must inject X-Bootstrap-Token for this one-time request.
-  bootstrap: (password: string) => request<Token>("/auth/bootstrap", undefined, { method: "POST", body: JSON.stringify({ email: "info@maistriconsulting.com", password }) }),
   login: (email: string, password: string) =>
     request<Token>("/auth/login", undefined, { method: "POST", body: JSON.stringify({ email, password }) }),
   tenants: (token: string) => request<Tenant[]>("/auth/tenants", token),

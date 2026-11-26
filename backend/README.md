@@ -30,14 +30,16 @@ The request requires the `X-Bootstrap-Token` header. Run it only from a trusted 
 
 The bootstrap endpoint is available only while the bootstrap token is configured and no user or tenant exists. A missing or incorrect token returns 404. If an account or tenant already exists, bootstrap returns 409. `GET /api/v1/auth/bootstrap-status` reports whether initialization has already occurred.
 
-After successful initialization:
+Use the activation script from an interactive terminal on the API host:
 
-1. Verify login for `info@maistriconsulting.com`.
-2. Verify `GET /api/v1/auth/platform/overview` with the superadmin token.
-3. Remove `BOOTSTRAP_TOKEN` from the protected service environment.
-4. Restart the backend and verify that a repeated bootstrap attempt returns 409.
+```bash
+cd ~/apps/spark-mi/backend
+.venv/bin/python scripts/activate_superadmin.py
+```
 
-Do not expose the bootstrap token through the frontend. The initial setup UI must not be used to send the token from the browser.
+It asks for the password, creates the account, verifies login and `GET /api/v1/auth/platform/overview`, checks that a repeated bootstrap returns 409 while the token is still configured, then blanks `BOOTSTRAP_TOKEN`, restarts the service and checks that the endpoint now returns 404. It can be re-run if it stops halfway.
+
+The frontend has no bootstrap form.
 
 ## Authentication and tenant access
 
