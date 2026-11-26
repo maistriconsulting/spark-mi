@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { api, Project, Tenant } from "./api";
 
 type Session = { userToken: string; tenantToken?: string; tenant?: Tenant };
