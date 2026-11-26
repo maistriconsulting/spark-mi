@@ -1,24 +1,15 @@
 name: Deploy SPARK-MI frontend to Hostinger
 
 on:
-  push:
-    branches:
-      - feat/multi-tenant-foundation
-    paths:
-      - "frontend/**"
-      - ".github/workflows/deploy-hostinger.yml"
+  # Deployment is intentionally paused until the source tree is moved out
+  # of the public document root and the target is verified as safe.
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: spark-mi-hostinger-frontend
-  cancel-in-progress: true
-
 jobs:
-  build-and-deploy:
-    if: vars.HOSTINGER_DEPLOY_ENABLED == 'true'
+  build-only:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -42,70 +33,8 @@ jobs:
           test -s dist/index.html
           cp .htaccess dist/.htaccess
 
-      - name: Configure SSH and verify Hostinger host key
-        env:
-          HOST: 82.25.102.236
-          PORT: "65002"
-          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+      - name: Deployment safety notice
         run: |
-          set -euo pipefail
-          install -m 700 -d ~/.ssh
-
-          # Write the multiline OpenSSH private key directly; no Base64 conversion needed.
-          test -n "$SSH_PRIVATE_KEY"
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          if ! ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null 2>~/.ssh/key-validation.err; then
-            echo "HOSTINGER_SSH_PRIVATE_KEY is not a readable OpenSSH private key."
-            echo "Check the GitHub secret formatting. Do not share the key in chat."
-            exit 1
-          fi
-          rm -f ~/.ssh/key-validation.err
-
-          expected_fingerprint='SHA256:uVyIOytiFFef1uJCpSfbGGveVB4Op6oFQWIcz735b8M'
-          key_file="$(mktemp)"
-          scan_error="$(mktemp)"
-          trap 'rm -f "$key_file" "$scan_error"' EXIT
-
-          echo "Checking SSH host-key endpoint on Hostinger..."
-          scan_status=0
-          ssh-keyscan -T 20 -p "$PORT" -t ed25519 "$HOST" > "$key_file" 2> "$scan_error" || scan_status=$?
-
-          if [ ! -s "$key_file" ]; then
-            echo "Unable to retrieve an ED25519 host key (ssh-keyscan exit: $scan_status)."
-            cat "$scan_error"
-            exit 1
-          fi
-
-          actual_fingerprint="$(ssh-keygen -lf "$key_file" -E sha256 | awk '{print $2}')"
-          if [ "$actual_fingerprint" != "$expected_fingerprint" ]; then
-            echo "Hostinger ED25519 fingerprint mismatch."
-            echo "Expected: $expected_fingerprint"
-            echo "Received: $actual_fingerprint"
-            exit 1
-          fi
-
-          cp "$key_file" ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-          echo "Hostinger ED25519 host key verified."
-
-      - name: Validate destination and deploy static files
-        env:
-          HOST: 82.25.102.236
-          PORT: "65002"
-          USER: u834942357
-          TARGET: ${{ secrets.HOSTINGER_SSH_TARGET }}
-        run: |
-          set -euo pipefail
-          test -n "$TARGET"
-          case "$TARGET" in
-            */public_html) ;;
-            *)
-              echo "HOSTINGER_SSH_TARGET must be the exact domain document root ending in /public_html"
-              exit 1
-              ;;
-          esac
-          rsync -az --delete \
-            -e "ssh -p $PORT -o StrictHostKeyChecking=yes" \
-            frontend/dist/ "$USER@$HOST:$TARGET/"
+          echo "Build completed. Hostinger deployment is paused."
+          echo "No SSH connection, upload, overwrite, or deletion was performed."
+          echo "Resume deployment only after the project source is outside public_html."
