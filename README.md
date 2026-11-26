@@ -29,3 +29,13 @@ Non inserire mai credenziali, token o chiavi reali nel repository. I file `.env`
 - [Piano di ricerca](docs/research-plan.md)
 - [Roadmap](docs/roadmap.md)
 - [Governance e qualità](docs/governance.md)
+
+## Principi
+
+1. Ogni informazione rilevante deve avere fonte e data di rilevazione.
+2. Prezzi osservati, quotazioni e stime devono essere distinti.
+3. Dati mancanti non vanno inventati.
+4. Separare fatti, dichiarazioni, inferenze e ipotesi.
+5. I dati di un tenant non sono accessibili agli altri tenant.
+6. Le decisioni strategiche restano soggette a validazione umana.
+7. Le configurazioni specifiche di un mercato non devono diventare vincoli del prodotto.
