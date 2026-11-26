@@ -1,0 +1,40 @@
+name: Deploy SPARK-MI frontend to Hostinger
+
+on:
+  # Deployment is intentionally paused until the source tree is moved out
+  # of the public document root and the target is verified as safe.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: https://sparkmi-api.bianconiglio.eu/api/v1
+        run: |
+          npm run build
+          test -s dist/index.html
+          cp .htaccess dist/.htaccess
+
+      - name: Deployment safety notice
+        run: |
+          echo "Build completed. Hostinger deployment is paused."
+          echo "No SSH connection, upload, overwrite, or deletion was performed."
+          echo "Resume deployment only after the project source is outside public_html."

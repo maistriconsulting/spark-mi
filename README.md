@@ -4,14 +4,21 @@
 
 Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagne, fonti, dati, agenti, budget e report propri. Il motore applicativo, gli strumenti e le tassonomie comuni possono essere condivisi senza esporre i dati riservati tra aziende.
 
-## Obiettivi
-- Gestire più aziende e più utenti con ruoli e permessi.
-- Creare progetti e campagne di ricerca indipendenti per qualsiasi mercato.
-- Coordinare agenti specialistici attraverso workflow configurabili.
-- Conservare fonti, evidenze, claim, verifiche e storico.
-- Confrontare aziende, prodotti, tecnologie, prezzi, clienti e modelli commerciali.
-- Produrre report ed esportazioni tracciabili.
-- Controllare costi, qualità, sicurezza e accesso ai dati.
+## Repository
+
+- `backend/`: API FastAPI, autenticazione, tenancy e accesso MariaDB.
+- `frontend/`: React + TypeScript, compilato come sito statico per Hostinger.
+- `docs/`: architettura, modello dati, agenti, tenancy, governance e roadmap.
+
+## Stato del rilascio
+
+La foundation multi-tenant e il bootstrap superadmin sono integrati in `feat/multi-tenant-foundation` (merge commit `3101f02`). Il rilascio in produzione è ancora da eseguire: backend Fedora, migrazione `0002_superadmin`, frontend e bootstrap account. Consultare [stato del rilascio](docs/release-status.md) per la sequenza e i criteri di chiusura.
+
+## Sviluppo
+
+Consultare [backend/README.md](backend/README.md) e [frontend/README.md](frontend/README.md). Configurazione ambiente di riferimento: [.env.example](.env.example).
+
+Non inserire mai credenziali, token o chiavi reali nel repository. I file `.env` sono esclusi da Git.
 
 ## Documentazione
 - [Project charter](docs/project-charter.md)
@@ -22,8 +29,10 @@ Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagn
 - [Piano di ricerca](docs/research-plan.md)
 - [Roadmap](docs/roadmap.md)
 - [Governance e qualità](docs/governance.md)
+- [Stato del rilascio](docs/release-status.md)
 
 ## Principi
+
 1. Ogni informazione rilevante deve avere fonte e data di rilevazione.
 2. Prezzi osservati, quotazioni e stime devono essere distinti.
 3. Dati mancanti non vanno inventati.
@@ -31,5 +40,3 @@ Ogni azienda lavora in uno spazio isolato (tenant) con utenti, progetti, campagn
 5. I dati di un tenant non sono accessibili agli altri tenant.
 6. Le decisioni strategiche restano soggette a validazione umana.
 7. Le configurazioni specifiche di un mercato non devono diventare vincoli del prodotto.
-
-> Stato: repository in fase di definizione tecnica. Target e stime nei documenti sono criteri di pianificazione, non risultati di ricerca già ottenuti.
