@@ -2,12 +2,8 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class BootstrapRequest(BaseModel):
-    bootstrap_token: str = Field(min_length=24)
     email: EmailStr
-    full_name: str = Field(min_length=2, max_length=160)
     password: str = Field(min_length=12, max_length=128)
-    organization_name: str = Field(min_length=2, max_length=160)
-    organization_slug: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$")
 
 
 class LoginRequest(BaseModel):
@@ -22,6 +18,7 @@ class SelectTenantRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    is_superadmin: bool = False
 
 
 class TenantSummary(BaseModel):
@@ -31,3 +28,13 @@ class TenantSummary(BaseModel):
     role: str
 
     model_config = {"from_attributes": True}
+
+
+class BootstrapStatusResponse(BaseModel):
+    initialized: bool
+
+
+class PlatformOverviewResponse(BaseModel):
+    user_count: int
+    tenant_count: int
+    tenants: list[TenantSummary]

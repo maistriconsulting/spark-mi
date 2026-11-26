@@ -22,24 +22,21 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ## First setup
 
-Call `POST /api/v1/auth/bootstrap` once with the bootstrap token, first owner credentials, and initial organization. Example:
+Call `POST /api/v1/auth/bootstrap` once from a trusted operator context with the bootstrap token in the `X-Bootstrap-Token` header. It creates only the global superadmin `info@maistriconsulting.com`; it does not create a tenant or membership. The password is supplied at activation time and is never stored in this repository.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/auth/bootstrap \
   -H 'Content-Type: application/json' \
+  -H "X-Bootstrap-Token: $BOOTSTRAP_TOKEN" \
   -d '{
-    "bootstrap_token": "YOUR_BOOTSTRAP_TOKEN",
-    "email": "owner@example.com",
-    "full_name": "Workspace Owner",
-    "password": "A_LONG_UNIQUE_PASSWORD",
-    "organization_name": "Example Organization",
-    "organization_slug": "example-organization"
+    "email": "info@maistriconsulting.com",
+    "password": "CHOOSE_A_UNIQUE_PASSWORD_OF_AT_LEAST_12_CHARACTERS"
   }'
 ```
 
-The endpoint is disabled after the first user or tenant exists. Remove `BOOTSTRAP_TOKEN` from the environment after successful initialization.
+The endpoint is disabled after the first user or tenant exists. Do not send `BOOTSTRAP_TOKEN` from browser JavaScript; if the initial setup screen is used, a trusted server-side gateway must inject the header. Remove `BOOTSTRAP_TOKEN` from the environment after successful initialization.
 
-Login returns a user token. Call `GET /api/v1/auth/tenants`, then `POST /api/v1/auth/select-tenant` to receive a tenant-scoped token. Tenant access is revalidated against active membership on every request.
+Login returns a user token. Call `GET /api/v1/auth/tenants`, then `POST /api/v1/auth/select-tenant` to receive a tenant-scoped token. Tenant access is revalidated against active membership on every request. `GET /api/v1/auth/platform/overview` is restricted to the database-backed global superadmin role.
 
 ## Hostinger MariaDB
 
