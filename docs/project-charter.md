@@ -1,44 +1,39 @@
-# Project charter — SPARK-MI / Novotic
+# Project charter — SPARK-MI
 
 ## Scopo
-Progettare una piattaforma di Market Intelligence multi-agente per ricerche ripetibili e verificabili sul mercato dei sistemi robotizzati di pallettizzazione e depallettizzazione. Il sistema produce un database comparabile e analisi a supporto delle decisioni strategiche e commerciali di Novotic. L'architettura dovrà essere riutilizzabile per altri prodotti e mercati industriali.
+Progettare e realizzare una piattaforma multi-tenant di Market Intelligence che consenta a organizzazioni diverse di pianificare, eseguire e verificare ricerche su mercati differenti. La piattaforma combina workflow configurabili, agenti AI specialistici, fonti tracciabili, un database strutturato e strumenti di analisi.
 
-## Perimetro approvato
-- Mercato primario: Italia.
-- Benchmark: Europa.
-- Applicazioni: pallettizzazione e depallettizzazione.
-- Profondità: ricerca approfondita con database strutturato.
-- Posizionamento Novotic: confrontare tutti i modelli, senza assumerne uno come già scelto.
+SPARK-MI deve essere un prodotto riutilizzabile: nessun settore, paese, prodotto, cliente o caso d'uso deve essere incorporato come perimetro obbligatorio nel codice o nel modello dati.
 
-## Tecnologie incluse
-Robot industriali antropomorfi e bracci meccanici; cobot quando pertinenti; sistemi cartesiani e a portale; celle robotizzate; pallettizzatori/depalettizzatori convenzionali; visione artificiale; software di pianificazione e controllo; algoritmi di sequenziamento, presa e adattamento.
+## Utenti e organizzazioni
+- Un'organizzazione (tenant) può avere più utenti.
+- Ogni utente può appartenere a una o più organizzazioni, secondo i permessi assegnati.
+- Ogni organizzazione può gestire più progetti e campagne.
+- Ruoli, budget, configurazioni, dati e report sono associati al tenant.
+- Un amministratore di piattaforma può gestire il servizio senza ottenere automaticamente accesso ai contenuti riservati dei tenant.
 
-Distinguere sempre programmazione deterministica, sequenze parametrizzate, controllo adattivo, computer vision e AI/ML effettivamente documentata. Il semplice uso di un algoritmo non basta per definire una soluzione come AI.
+## Perimetro funzionale
+- Gestione organizzazioni, utenti, ruoli e inviti.
+- Gestione progetti, campagne, obiettivi, mercati e perimetri di ricerca.
+- Pianificazione e orchestrazione di task e agenti.
+- Discovery e analisi di aziende, prodotti, servizi, tecnologie, settori, clienti e modelli commerciali.
+- Raccolta di fonti, evidenze e claim verificabili.
+- Audit, approvazioni, report, esportazioni e storico.
+- Configurazione di provider, modelli AI, limiti e budget.
+- Tassonomie globali e personalizzazioni controllate per organizzazione.
 
-## Domande di ricerca
-1. Quali produttori, OEM, integratori e fornitori software operano in Italia e in Europa?
-2. Quali prodotti, modelli e configurazioni vendono?
-3. Quali prestazioni dichiarano e in quali condizioni?
-4. Quali prezzi sono pubblici o documentati? Quali elementi sono inclusi?
-5. Quali settori e applicazioni servono?
-6. Quali canali e modelli commerciali utilizzano?
-7. Chi sono concorrenti diretti, indiretti, sostitutivi e potenziali partner?
-8. Quali bisogni dei clienti risultano poco coperti?
-9. Quale modello di ingresso può essere coerente per Novotic?
-
-## Modelli di ingresso da confrontare
-- Produttore di macchina/cella completa.
-- System integrator.
-- Fornitore di piattaforma software, algoritmi o livello di controllo/orchestrazione.
-- Modello ibrido con piattaforma proprietaria, hardware selezionato e integrazione tramite partner.
-
-Confrontare investimento, competenze richieste, controllo della soluzione, dipendenza dai fornitori, margini potenziali, tempi di vendita, responsabilità post-vendita, scalabilità e barriere competitive. Non attribuire punteggi senza criteri espliciti e dati di supporto.
+## Configurabilità
+Ogni campagna definisce il proprio perimetro: mercati geografici, lingue, settori, categorie, applicazioni, concorrenti, domande, profondità, fonti consentite e criteri di completamento. I template possono accelerare la configurazione ma non devono imporre uno specifico mercato.
 
 ## Output attesi
-Database di aziende, prodotti, caratteristiche, tecnologie, applicazioni, prezzi e fonti; mappa competitiva; schede standard; benchmark tecnico/economico; segmentazione clienti e mercati; confronto modelli di ingresso; report strategico; dashboard ed esportazioni.
+Piattaforma web multi-tenant; API documentate; database strutturato; orchestratore; agenti specializzati; gestione fonti/evidenze; dashboard; esportazioni; audit trail; strumenti di amministrazione e monitoraggio.
 
 ## Fuori perimetro iniziale
-Non raccogliere dati personali non necessari. Non inviare richieste commerciali automatiche senza approvazione. Non presentare stime come prezzi osservati o dati certi. Le decisioni strategiche restano soggette a validazione umana.
+- Invio automatico di comunicazioni commerciali senza approvazione.
+- Raccolta di dati personali non necessari.
+- Accesso o aggiramento di login, paywall, CAPTCHA o controlli.
+- Conclusioni strategiche automatiche prive di evidenze e revisione.
+- Condivisione dei dati tra tenant senza autorizzazione esplicita e tracciata.
 
 ## Definizione di completamento
-La ricerca si considera conclusa in base a copertura documentata, qualità delle fonti, completezza e comparabilità, gestione esplicita delle lacune e revisione umana, non in base al numero di pagine generate.
+Il prodotto è pronto quando un'organizzazione può creare uno spazio isolato, invitare utenti, configurare un progetto di ricerca, eseguire workflow, verificare le evidenze e produrre report senza poter leggere o modificare dati appartenenti ad altre organizzazioni.
