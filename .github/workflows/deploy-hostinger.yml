@@ -46,7 +46,7 @@ jobs:
         env:
           HOST: 82.25.102.236
           PORT: "65002"
-          SSH_PRIVATE_KEY_B64: \${{ secrets.HOSTINGER_SSH_PRIVATE_KEY_B64 }}
+          SSH_PRIVATE_KEY_B64: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY_B64 }}
         run: |
           set -euo pipefail
           install -m 700 -d ~/.ssh
@@ -95,7 +95,7 @@ jobs:
           HOST: 82.25.102.236
           PORT: "65002"
           USER: u834942357
-          TARGET: \${{ secrets.HOSTINGER_SSH_TARGET }}
+          TARGET: ${{ secrets.HOSTINGER_SSH_TARGET }}
         run: |
           set -euo pipefail
           test -n "$TARGET"
