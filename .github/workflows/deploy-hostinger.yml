@@ -1,0 +1,79 @@
+name: Deploy SPARK-MI frontend to Hostinger
+
+on:
+  push:
+    branches:
+      - feat/multi-tenant-foundation
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy-hostinger.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spark-mi-hostinger-frontend
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    # Keep disabled until Hostinger SSH secrets are configured and its native
+    # repository deployment has been switched to manual/off.
+    if: vars.HOSTINGER_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: https://sparkmi-api.bianconiglio.eu/api/v1
+        run: |
+          npm run build
+          test -s dist/index.html
+          cp .htaccess dist/.htaccess
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Validate destination and deploy static files
+        env:
+          HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+          USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_SSH_TARGET }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST"
+          test -n "$PORT"
+          test -n "$USER"
+          test -n "$TARGET"
+          case "$TARGET" in
+            */public_html) ;;
+            *)
+              echo "HOSTINGER_SSH_TARGET must be the exact domain document root ending in /public_html"
+              exit 1
+              ;;
+          esac
+          rsync -az --delete \
+            -e "ssh -p $PORT -o StrictHostKeyChecking=yes" \
+            frontend/dist/ "$USER@$HOST:$TARGET/"
