@@ -45,8 +45,8 @@ jobs:
 
       - name: Configure SSH
         env:
-          SSH_PRIVATE_KEY: \${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: \${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.HOSTINGER_SSH_KNOWN_HOSTS }}
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
@@ -56,10 +56,10 @@ jobs:
 
       - name: Validate destination and deploy static files
         env:
-          HOST: \${{ secrets.HOSTINGER_SSH_HOST }}
-          PORT: \${{ secrets.HOSTINGER_SSH_PORT }}
-          USER: \${{ secrets.HOSTINGER_SSH_USER }}
-          TARGET: \${{ secrets.HOSTINGER_SSH_TARGET }}
+          HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+          USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_SSH_TARGET }}
         run: |
           set -euo pipefail
           test -n "$HOST"
