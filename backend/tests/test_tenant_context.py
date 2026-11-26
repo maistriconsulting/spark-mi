@@ -1,3 +1,4 @@
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
@@ -25,14 +26,15 @@ def test_tenant_context_requires_active_membership():
         db.commit()
 
         token = create_access_token(user_id=user.id, tenant_id=tenant.id)
-        ctx = get_tenant_context(user=user, token=token, db=db)
+        credentials = HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
+        ctx = get_tenant_context(user=user, credentials=credentials, db=db)
         assert ctx.tenant_id == tenant.id
         assert ctx.role == "analyst"
 
         membership.status = "revoked"
         db.commit()
         try:
-            get_tenant_context(user=user, token=token, db=db)
+            get_tenant_context(user=user, credentials=credentials, db=db)
             assert False, "revoked membership must not grant tenant access"
         except Exception as exc:
             assert getattr(exc, "status_code", None) == 403
