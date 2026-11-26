@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from sqlalchemy import create_engine
+from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import settings
@@ -9,16 +9,17 @@ class Base(DeclarativeBase):
     pass
 
 
-connect_args = {}
-if settings.db_ssl:
-    # PyMySQL uses this option to require TLS for remote database connections.
-    connect_args["ssl"] = {}
-
-DATABASE_URL = (
-    f"mysql+pymysql://{settings.db_user}:{settings.db_password}"
-    f"@{settings.db_host}:{settings.db_port}/{settings.db_name}?charset=utf8mb4"
+DATABASE_URL = URL.create(
+    "mysql+pymysql",
+    username=settings.db_user,
+    password=settings.db_password,
+    host=settings.db_host,
+    port=settings.db_port,
+    database=settings.db_name,
+    query={"charset": "utf8mb4"},
 )
 
+connect_args = {"ssl": {}} if settings.db_ssl else {}
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
