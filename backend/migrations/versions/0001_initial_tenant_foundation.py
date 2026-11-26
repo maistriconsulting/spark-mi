@@ -20,7 +20,6 @@ def upgrade():
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.UniqueConstraint("email", name="uq_users_email"),
     )
     op.create_index("ix_users_email", "users", ["email"], unique=True)
 
@@ -31,7 +30,6 @@ def upgrade():
         sa.Column("slug", sa.String(80), nullable=False),
         sa.Column("status", sa.String(24), nullable=False, server_default="active"),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.UniqueConstraint("slug", name="uq_tenants_slug"),
     )
     op.create_index("ix_tenants_slug", "tenants", ["slug"], unique=True)
 
